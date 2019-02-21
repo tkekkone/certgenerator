@@ -5,7 +5,7 @@ if [ $# -ne 4 ]; then
 	exit 1
 fi
 serverkey=$4
-echo "paramters you gave: $1 $2 $3 $4"
+echo "Parameters you gave: $1 $2 $3 $4"
 echo "Generating ssl certificate"
 openssl genrsa -des3 -passout pass:$serverkey -out servercert.key 4096
 openssl req -new -key servercert.key -passin pass:$serverkey -out servercert.csr -subj "/CN=$(hostname)"
@@ -14,6 +14,6 @@ openssl pkcs12 -export -passin pass:$serverkey -clcerts -in servercert.cer -inke
 echo "#######################################"
 echo "Your certificate name is: $(hostname) use that from mono store"
 echo "#######################################"
-echo "Adding to mono store"
-certmgr -importKey -c -v -p $serverkey -m My servercert.p12
-certmgr -add -c -m My servercert.cer 
+echo "Adding to mono store. Running with sudo."
+sudo certmgr -importKey -c -v -p $serverkey -m My servercert.p12
+sudo certmgr -add -c -m My servercert.cer 
