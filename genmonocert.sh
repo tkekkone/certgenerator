@@ -27,7 +27,6 @@ if [ -n $genca ]; then
 	echo "Generating ssl ca certificate because it was not given as parameter"
 	openssl genrsa -passout pass:$capass -des3 -out $cafile 4096
 	openssl req -passin pass:$capass -new -subj "/C=FI/ST=Siikalatva/L=Karinkanta/O=Navetta/OU=Lanta/CN=$(hostname)" -x509 -days 365 -key ca.key -out $cacertfile
-	
 fi
 
 echo "Generating ssl certificate"
