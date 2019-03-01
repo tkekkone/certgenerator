@@ -1,5 +1,9 @@
 #!/bin/bash
-
+function failcertmgr
+{
+	echo "No certmgr found. Not added to mono store."
+	exit 0
+}
 
 if [ $# -ne 4 ]; then
 	echo "Not enough arguments given."
@@ -37,10 +41,12 @@ openssl pkcs12 -export -passin pass:$serverkey -clcerts -in servercert.cer -inke
 echo "#######################################"
 echo "Your certificate name is: $(hostname) add that to vtrinserver config"
 echo "#######################################"
-if [ -f certmgr ]; then
+if [ ! -n $(which certmgr) ]; then
 	echo "Adding to mono store"
-	sudo certmgr -importKey -c -v -p $serverkey -m My servercert.p12
-	sudo certmgr -add -c -m My servercert.cer 
+	certmgr || failcertmgr
+	sudo certmgr -importKey -c -v -p $serverkey -m My servercert.p12 || failcertmgr
+	sudo certmgr -add -c -m My servercert.cer || failcertmgr
+	echo "Added to store"
 else
-	echo "Theres no cert manager. Not adding to store"
+	failcertmgr
 fi
