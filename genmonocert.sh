@@ -39,7 +39,7 @@ openssl req -new -key servercert.key -passin pass:$serverkey -out servercert.csr
 openssl x509 -req -days 365 -extfile <(printf "subjectAltName=DNS:localhost,DNS:$(hostname)") -in servercert.csr -CA $cacertfile -passin pass:$capass -CAkey $cafile -set_serial 01 -out servercert.cer
 openssl pkcs12 -export -passin pass:$serverkey -clcerts -in servercert.cer -inkey servercert.key -out servercert.p12 -passout pass:$serverkey -name $(hostname)
 echo "#######################################"
-echo "Your certificate name is: $(hostname) add that to vtrinserver config"
+echo "Your certificate name is: $(hostname) add that to config to use form mono store"
 echo "#######################################"
 if [ ! -n $(which certmgr) ]; then
 	echo "Adding to mono store"
