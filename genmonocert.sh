@@ -23,6 +23,8 @@ else
 	cacertfile=$1
 	cafile=$2
 fi
+echo "server key pass: $serverkey"
+echo "ca key pass $capass"
 echo "paramters you gave: $1 $2 $3"
 
 if [ -n $genca ]; then
@@ -32,10 +34,15 @@ if [ -n $genca ]; then
 	openssl genrsa -passout pass:$capass -des3 -out $cafile 4096
 	openssl req -passin pass:$capass -new -subj "/C=FI/ST=Siikalatva/L=Karinkanta/O=Navetta/OU=Lanta/CN=$(hostname)" -x509 -days 365 -key ca.key -out $cacertfile
 fi
-
 echo "Generating ssl certificate"
-openssl genrsa -des3 -passout pass:$serverkey -out servercert.key 4096
-openssl req -new -key servercert.key -passin pass:$serverkey -out servercert.csr -subj "/CN=$(hostname)"
+if [ -n $serverkey ]; then
+	echo "Generating server key without passphrase"
+	openssl genrsa -out servercert.key 4096
+	openssl req -new -key servercert.key -out servercert.csr -subj "/CN=$(hostname)"	
+else
+	openssl genrsa -des3 -passout pass:$serverkey -out servercert.key 4096
+	openssl req -new -key servercert.key -passin pass:$serverkey -out servercert.csr -subj "/CN=$(hostname)"
+fi
 openssl x509 -req -days 365 -extfile <(printf "subjectAltName=DNS:localhost,DNS:$(hostname)") -in servercert.csr -CA $cacertfile -passin pass:$capass -CAkey $cafile -set_serial 01 -out servercert.cer
 openssl pkcs12 -export -passin pass:$serverkey -clcerts -in servercert.cer -inkey servercert.key -out servercert.p12 -passout pass:$serverkey -name $(hostname)
 echo "#######################################"
