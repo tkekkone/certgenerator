@@ -48,12 +48,8 @@ openssl pkcs12 -export -passin pass:$serverkey -clcerts -in servercert.cer -inke
 echo "#######################################"
 echo "Your certificate name is: $(hostname) add that to config to use form mono store"
 echo "#######################################"
-if [ ! -n $(which certmgr) ]; then
-	echo "Adding to mono store"
-	certmgr || failcertmgr
-	sudo certmgr -importKey -c -v -p $serverkey -m My servercert.p12 || failcertmgr
-	sudo certmgr -add -c -m My servercert.cer || failcertmgr
-	echo "Added to store"
-else
-	failcertmgr
-fi
+certmgr || failcertmgr
+echo "Adding to mono store"
+sudo certmgr -importKey -c -v -p $serverkey -m My servercert.p12 || failcertmgr
+sudo certmgr -add -c -m My servercert.cer || failcertmgr
+echo "Added to store"
